@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auto Voyage</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2 { color: #333; }
+        input, button { padding: 10px; margin: 5px 0; }
+        #interpretation-result, #chat-response { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Auto Voyage</h1>
+
+    <section>
+        <h2>Dashboard Warning Light Interpretation & Troubleshooting</h2>
+        <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" name="file" id="file">
+            <button type="submit">Upload Image</button>
+        </form>
+        <div id="interpretation-result"></div>
+    </section>
+
+    <section>
+        <h2>Travel Assistance & Troubleshooting Chatbot</h2>
+        <input type="text" id="chat-input" placeholder="Ask for itinerary or troubleshooting">
+        <button id="chat-send">Send</button>
+        <div id="chat-response"></div>
+    </section>
+
+    <script>
+        // Handle dashboard image upload
+        $('#upload-form').on('submit', function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            $.ajax({
+                url: '/upload',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    $('#interpretation-result').html(
+                        "<p><strong>Warning Message:</strong> " + data.warning_message + "</p>" +
+                        "<p><strong>Troubleshooting Tip:</strong> " + data.troubleshooting_tip + "</p>"
+                    );
+                },
+                error: function(err) {
+                    $('#interpretation-result').html("<p>Error: " + err.responseJSON.error + "</p>");
+                }
+            });
+        });
+
+        // Handle chatbot messaging
+        $('#chat-send').on('click', function() {
+            var message = $('#chat-input').val();
+            // For itinerary requests, using fixed start and end locations for demonstration.
+            $.ajax({
+                url: '/chatbot',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({message: message, start: "Home", end: "Destination"}),
+                success: function(data) {
+                    $('#chat-response').html("<p>" + data.response + "</p>");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
