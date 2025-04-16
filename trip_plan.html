@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trip Plan Results - Auto Voyage</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <style>
+    .places-card { margin: 10px; }
+    .places-card img { max-width: 100%; height: auto; }
+    .directions-step { margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container my-4">
+    <!-- Flash Messages -->
+    <div class="flash">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-info">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+    
+    <!-- Header -->
+    <header class="d-flex justify-content-between align-items-center my-3">
+      <div>
+        <h1>Trip Plan Results</h1>
+        <p><strong>From:</strong> {{ origin }} <strong>To:</strong> {{ destination }}</p>
+      </div>
+      <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Home</a>
+    </header>
+    
+    <!-- Travel Information -->
+    {% if travel_info %}
+    <section class="travel-info my-4">
+      <h3>Travel Details</h3>
+      <p><strong>Distance:</strong> {{ travel_info.distance }}</p>
+      <p><strong>Estimated Travel Time:</strong> {{ travel_info.duration }}</p>
+    </section>
+    {% endif %}
+    
+    <!-- Directions -->
+    {% if directions %}
+    <section class="directions my-4">
+      <h3>Step-by-Step Directions</h3>
+      <ol>
+        {% for step in directions %}
+          <li class="directions-step">{{ step | safe }}</li>
+        {% endfor %}
+      </ol>
+    </section>
+    {% endif %}
+    
+    <!-- Snapped Road Coordinates -->
+    {% if snapped_roads %}
+    <section class="snapped-roads my-4">
+      <h3>Snapped Road Coordinates</h3>
+      <ul>
+        {% for lat, lng in snapped_roads %}
+          <li>{{ lat }}, {{ lng }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+    
+    <!-- Embedded Google Map -->
+    {% if map_embed_url %}
+    <section class="map-section my-4">
+      <h3>Google Maps Directions</h3>
+      <iframe width="100%" height="450" frameborder="0" style="border:0"
+              src="{{ map_embed_url }}" allowfullscreen>
+      </iframe>
+    </section>
+    {% endif %}
+    
+    <!-- Itinerary / Places -->
+    {% if itinerary %}
+    <section class="itinerary-section my-4">
+      <h3>Your Trip Itinerary</h3>
+      <div class="row">
+        {% for item in itinerary %}
+          <div class="col-md-4 places-card">
+            <div class="card">
+              <img class="card-img-top" src="{{ item.image_url }}" alt="{{ item.place_name }}">
+              <div class="card-body">
+                <h5 class="card-title">{{ item.place_name }}</h5>
+                <p class="card-text">{{ item.description }}</p>
+                <p><em>{{ item.visit_time }}</em></p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav my-4 d-flex justify-content-around">
+      <div class="nav-button text-center">
+        <img src="https://via.placeholder.com/24?text=S" alt="Share Icon">
+        <span>SHARE</span>
+      </div>
+      <div class="nav-button text-center">
+        <img src="https://via.placeholder.com/24?text=M" alt="Music Icon">
+        <span>MUSIC</span>
+      </div>
+      <div class="nav-button text-center">
+        <img src="https://via.placeholder.com/24?text=P" alt="Plan Icon">
+        <span>PLAN</span>
+      </div>
+      <div class="nav-button text-center">
+        <img src="https://via.placeholder.com/24?text=M" alt="Menu Icon">
+        <span>MENU</span>
+      </div>
+    </nav>
+    
+  </div>
+</body>
+</html>

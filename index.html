@@ -1,71 +1,178 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Auto Voyage</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1, h2 { color: #333; }
-        input, button { padding: 10px; margin: 5px 0; }
-        #interpretation-result, #chat-response { margin-top: 20px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Auto Voyage Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- Bootstrap CSS for additional styling -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Welcome to Auto Voyage</h1>
+  <div class="container my-4">
+    <!-- Flash Messages -->
+    <div class="flash">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-info">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
 
-    <section>
-        <h2>Dashboard Warning Light Interpretation & Troubleshooting</h2>
-        <form id="upload-form" enctype="multipart/form-data">
-            <input type="file" name="file" id="file">
-            <button type="submit">Upload Image</button>
-        </form>
-        <div id="interpretation-result"></div>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1>Auto Voyage!</h1>
+        <div class="vehicle-select">
+          <label for="vehicle">Select Vehicle:</label>
+          <select id="vehicle" name="vehicle">
+            <option value="Car">Car</option>
+            <option value="SUV">SUV</option>
+            <option value="Truck">Truck</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-danger">SOS</button>
+    </header>
+
+    <!-- Trip Planner Form -->
+    <section class="trip-planner">
+      <h3>Plan Your Trip</h3>
+      <form method="POST" action="{{ url_for('plan_trip') }}">
+        <div class="form-group">
+          <label for="starting-point">Starting Point</label>
+          <div class="input-group">
+            <input type="text" id="starting-point" name="starting-point" class="form-control" placeholder="Enter starting location">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="button" id="geo-btn">Use My Location</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="destination">Destination</label>
+          <input type="text" id="destination" name="destination" class="form-control" placeholder="Enter destination">
+        </div>
+        <button type="submit" class="btn btn-primary">Plan My Trip</button>
+      </form>
     </section>
-
-    <section>
-        <h2>Travel Assistance & Troubleshooting Chatbot</h2>
-        <input type="text" id="chat-input" placeholder="Ask for itinerary or troubleshooting">
-        <button id="chat-send">Send</button>
-        <div id="chat-response"></div>
+    
+    <!-- Image Upload (Vehicle Diagnostics) -->
+    <section class="upload-section my-4">
+      <h3>Upload Photo (Vehicle Diagnostic)</h3>
+      <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <input type="file" id="file-input" name="image" accept="image/*" class="form-control-file" required>
+        </div>
+        <button type="submit" class="btn btn-secondary">Upload to Server</button>
+      </form>
+      <img id="preview" src="#" alt="Preview" style="display:none;">
+      {% if filename %}
+        <h4>Uploaded Image:</h4>
+        <img class="uploaded-image" src="{{ url_for('display_image', filename=filename) }}" alt="Uploaded Image">
+      {% endif %}
     </section>
+    
+    <!-- Diagnostic Result -->
+    <section class="result-section my-4">
+      {% if label %}
+        <h2>Diagnostic Prediction: <strong>{{ label }}</strong></h2>
+        <h4>Explanation:</h4>
+        <p>{{ explanation }}</p>
+      {% endif %}
+      {% if result %}
+        <h5>Full Prediction JSON:</h5>
+        <pre>{{ result | tojson(indent=2) }}</pre>
+      {% endif %}
+    </section>
+    
+    <!-- Chatbot Section (using Ollama) -->
+    <section class="chat-container my-4">
+      <h3>Chat with Our Assistant</h3>
+      <div class="form-group">
+        <textarea id="chat-input" class="form-control" placeholder="Type your message here..."></textarea>
+      </div>
+      <button id="send-btn" class="btn btn-primary">Send</button>
+      <div id="chat-response" class="chat-response mt-3"></div>
+    </section>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <div class="nav-button">
+        <img src="https://via.placeholder.com/24?text=S" alt="Share Icon">
+        <span>SHARE</span>
+      </div>
+      <div class="nav-button">
+        <img src="https://via.placeholder.com/24?text=M" alt="Music Icon">
+        <span>MUSIC</span>
+      </div>
+      <div class="nav-button">
+        <img src="https://via.placeholder.com/24?text=P" alt="Plan Icon">
+        <span>PLAN</span>
+      </div>
+      <div class="nav-button">
+        <img src="https://via.placeholder.com/24?text=M" alt="Menu Icon">
+        <span>MENU</span>
+      </div>
+    </nav>
+  </div>
 
-    <script>
-        // Handle dashboard image upload
-        $('#upload-form').on('submit', function(e) {
-            e.preventDefault();
-            var formData = new FormData(this);
-            $.ajax({
-                url: '/upload',
-                type: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function(data) {
-                    $('#interpretation-result').html(
-                        "<p><strong>Warning Message:</strong> " + data.warning_message + "</p>" +
-                        "<p><strong>Troubleshooting Tip:</strong> " + data.troubleshooting_tip + "</p>"
-                    );
-                },
-                error: function(err) {
-                    $('#interpretation-result').html("<p>Error: " + err.responseJSON.error + "</p>");
-                }
-            });
+  <!-- JavaScript -->
+  <script>
+    // Image preview for uploads.
+    const fileInput = document.getElementById('file-input');
+    const preview = document.getElementById('preview');
+    fileInput.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.setAttribute('src', e.target.result);
+          preview.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // Geolocation to auto-fill the starting point.
+    const geoBtn = document.getElementById('geo-btn');
+    geoBtn.addEventListener('click', function() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const coords = `${position.coords.latitude},${position.coords.longitude}`;
+          document.getElementById('starting-point').value = coords;
+        }, (error) => {
+          alert("Error retrieving your location. Please try again.");
+          console.error("Geolocation error:", error);
         });
-
-        // Handle chatbot messaging
-        $('#chat-send').on('click', function() {
-            var message = $('#chat-input').val();
-            // For itinerary requests, using fixed start and end locations for demonstration.
-            $.ajax({
-                url: '/chatbot',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({message: message, start: "Home", end: "Destination"}),
-                success: function(data) {
-                    $('#chat-response').html("<p>" + data.response + "</p>");
-                }
-            });
-        });
-    </script>
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    });
+    
+    // Chatbot AJAX call using Ollama.
+    document.getElementById("send-btn").addEventListener("click", function() {
+      const message = document.getElementById("chat-input").value;
+      if (!message) {
+        alert("Please enter a message.");
+        return;
+      }
+      fetch("/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({ "message": message })
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("chat-response").innerHTML = "<strong>Assistant:</strong> " + data.response;
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        document.getElementById("chat-response").innerHTML = "There was an error processing your request.";
+      });
+    });
+  </script>
 </body>
 </html>

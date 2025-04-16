@@ -1,0 +1,182 @@
+/* ------------- RESET / GLOBAL STYLES ------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: url("/static/images/wb3.jpg") no-repeat center center;
+  background-size: cover;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ------------- CONTAINER ------------- */
+.container {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+  /* Optionally remove background-color so the background image shows through */
+  /* background-color: transparent; */
+  position: relative;
+}
+
+/* ------------- HEADER ------------- */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.greeting {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.select-vehicle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.select-vehicle select {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+}
+
+.sos-button {
+  background-color: #f00;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* ------------- WEATHER INFO ------------- */
+.weather-info {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  margin: 8px 0;
+}
+
+/* ------------- MAIN CONTENT ------------- */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.input-box {
+  width: 80%;
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  background-color: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+.input-box label {
+  margin-right: 8px;
+  font-size: 0.9rem;
+  color: #333;
+  white-space: nowrap;
+}
+
+.input-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font-size: 0.9rem;
+}
+
+.time-boxes {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.time-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.time-box label {
+  margin-bottom: 4px;
+  font-size: 0.8rem;
+  color: #333;
+}
+
+.time-box input {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+}
+
+/* ------------- ARROW ICON ------------- */
+.arrow-icon {
+  width: 80px;
+  height: 80px;
+  background: url('https://via.placeholder.com/80?text=Arrow') center/cover no-repeat;
+  margin-top: 16px;
+}
+
+/* ------------- FOOTER NAV ------------- */
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0;
+  background-color: #eee;
+  border-top: 1px solid #ccc;
+}
+
+.nav-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.nav-button img {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+}
+
+.nav-button span {
+  font-size: 0.8rem;
+  color: #333;
+}
