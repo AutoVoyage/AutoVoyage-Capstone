@@ -1,0 +1,6 @@
+Flask
+requests
+roboflow
+polyline
+openai
+python-dotenv
